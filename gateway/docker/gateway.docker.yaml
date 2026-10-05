@@ -1,0 +1,103 @@
+# agent_search_gateway —— 容器内使用的配置（由 Dockerfile 复制为 /app/gateway.yaml）
+#
+# 与 gateway.yaml.example 的差异只有三处，都是容器环境必需：
+#   1. gateway.host = 0.0.0.0（127.0.0.1 在容器内会让端口无法从宿主机访问）
+#   2. searxng.url    指向 compose 服务名 searxng:8080（官方镜像内部端口）
+#   3. flaresolverr.url 指向 compose 服务名 flaresolverr:8191
+#
+# token 走环境变量 GATEWAY_TOKEN（在 .env 里），不写此文件。
+
+gateway:
+  host: 0.0.0.0
+  port: 3000
+  token: ""
+
+logging:
+  level: info
+  file: ""
+
+searxng:
+  url: http://searxng:8080
+  timeout_ms: 10000
+
+flaresolverr:
+  url: http://flaresolverr:8191
+  enabled: true
+  timeout_ms: 60000
+  max_concurrent: 2
+  trigger_status: [403, 405, 429]
+  fallback_on_empty: true
+
+search:
+  max_results: 10
+  max_result_chars: 500
+  cache_ttl_ms: 300000
+  cache_max_entries: 200
+  max_concurrent: 2
+  fallback: true
+  # 从环境变量 TAVILY_API_KEY 注入，勿写文件
+  tavily_api_key: ""
+
+rerank:
+  enabled: true
+  engine_boost:
+    bilibili: 1.2
+    "google cse": 1.0
+    bing: 1.0
+    duckduckgo: 1.0
+    brave: 1.0
+    wikipedia: 1.0
+    github: 1.0
+    stackoverflow: 1.0
+    reddit: 1.0
+    news: 1.0
+
+ad_filter:
+  enabled: true
+  level: ads
+  extra_domains: []
+  hosts_file: data/adblock/hosts
+  auto_update: true
+  auto_update_interval_ms: 86400000
+  allowlist:
+    - wikipedia.org
+    - github.com
+    - github.io
+    - githubusercontent.com
+    - stackoverflow.com
+    - stackexchange.com
+    - reddit.com
+    - youtube.com
+    - google.com
+    - bing.com
+
+fetch:
+  timeout_ms: 15000
+  max_bytes: 5242880
+  user_agent: ""
+  block_private_ips: true
+  # 容器内豁免 compose 网段与常见代理 fake-ip 段，否则 searxng/flaresolverr 会被 SSRF 防护拦下
+  private_ip_exempt_cidrs:
+    - 198.18.0.0/15
+    - fdfe:dcba:9876::/64
+  structural: clean
+  max_output_chars: 20000
+  cache_ttl_ms: 600000
+  cache_max_entries: 200
+
+browser:
+  enabled: true
+  headless: true
+  pool_size: 1
+  idle_ttl_ms: 360000
+  timeout_ms: 30000
+  max_concurrent: 2
+  engine: chromium
+  proxy_server: ""
+  proxy_username: ""
+  proxy_password: ""
+  wait_for_selector: ""
+  screenshot:
+    enabled: true
+    max_size: 512
+    image_type: jpeg

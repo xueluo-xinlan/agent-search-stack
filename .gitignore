@@ -10,6 +10,10 @@ config.local.yaml
 searxng/hostnames-remove.yml
 searxng/hostnames-*.json
 
+# Docker 运行时状态（settings.yml 含随机 secret_key，由 scripts/docker-up.sh 生成）
+gateway/docker/searxng/
+gateway/docker/.secret
+
 # 依赖与构建产物
 node_modules/
 dist/

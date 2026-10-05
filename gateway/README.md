@@ -58,12 +58,27 @@ gateway (本服务, :3000/mcp)
 | `BROWSER_UNAVAILABLE` | 浏览器未启用 | 检查配置 |
 | `BROWSER_ERROR` | 浏览器操作失败 | 可重试 |
 
-## 快速开始
+## 部署
+
+两条互斥路径，终点都是 `http://127.0.0.1:3000/mcp`。完整说明（配置分层、数据卷、升级与排错）见 [`docs/deployment.md`](docs/deployment.md)。
 
 ```bash
-cd ~/Projects/agent_search_gateway
-npm install
-npx playwright install chromium    # 首次安装浏览器
+# A) Docker（推荐）：起 gateway + SearXNG + FlareSolverr，自动生成 token，等 /health 通过
+./scripts/docker-up.sh
+
+# B) 裸机（无 Docker，装 systemd 单元，自备 SearXNG/FlareSolverr）
+sudo ./scripts/install-native.sh
+```
+
+- 容器内配置在 `docker/gateway.docker.yaml`（`host: 0.0.0.0` + compose 服务名寻址），宿主机端口只绑回环，token 由 `.env` 的 `GATEWAY_TOKEN` 注入。
+- 只要 `search` / `fetch`、不要 `browser_*` 与 SPA 渲染时：`docker compose build --build-arg INSTALL_BROWSER=0`（镜像小 ~700MB、构建快很多）。
+
+## 快速开始（裸机手动装）
+
+```bash
+cd gateway                            # 本仓库内的 gateway/ 目录
+npm ci                                # 有 package-lock.json，用 ci 可复现
+npx playwright install chromium       # 首次安装浏览器
 cp gateway.yaml.example gateway.yaml
 ./scripts/gateway.sh start           # 启动三件套（searxng/flaresolverr/gateway）
 ./scripts/gateway.sh status

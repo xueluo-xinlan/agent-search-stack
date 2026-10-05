@@ -1,0 +1,91 @@
+# agent_search_gateway —— 三件套编排
+#
+#   gateway      统一 MCP 网关（本仓库源码构建）
+#   searxng      元搜索后端（官方镜像，容器内 8080）
+#   flaresolverr 反爬/JS 渲染后端（官方镜像，容器内 8191）
+#
+# 一键起： ./scripts/docker-up.sh     （会生成 .env 与 searxng/settings.yml）
+# 手动起： 先 cp .env.example .env 并填 GATEWAY_TOKEN，再 docker compose up -d --build
+#
+# 端口一律只绑回环地址；要对外暴露请自行加反代与鉴权。
+
+name: agent-search
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: agent-search-gateway:latest
+    container_name: asg-gateway
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      GATEWAY_CONFIG: /app/gateway.yaml
+      GATEWAY_TOKEN: ${GATEWAY_TOKEN:-}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
+      TZ: ${TZ:-UTC}
+    volumes:
+      # 容器版配置（host 0.0.0.0 + 服务名寻址）；要改参数就改这个文件再重启
+      - ./docker/gateway.docker.yaml:/app/gateway.yaml:ro
+      # 广告过滤 hosts 缓存持久化
+      - adblock-data:/app/data/adblock
+    depends_on:
+      searxng:
+        condition: service_started
+      flaresolverr:
+        condition: service_started
+    mem_limit: 1g
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  searxng:
+    image: searxng/searxng:latest
+    container_name: asg-searxng
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8890:8080"
+    volumes:
+      # settings.yml 由 scripts/docker-up.sh 从 searxng/settings.yml.example 生成
+      - ./docker/searxng:/etc/searxng:rw
+    environment:
+      SEARXNG_BASE_URL: http://127.0.0.1:8890/
+      TZ: ${TZ:-UTC}
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  flaresolverr:
+    image: flaresolverr/flaresolverr:latest
+    container_name: asg-flaresolverr
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8191:8191"
+    environment:
+      LOG_LEVEL: info
+      # 上游代理（如需要绕过地域限制）
+      # HTTP_PROXY: http://host.docker.internal:7890
+      TZ: ${TZ:-UTC}
+    # Chromium 需要共享内存，默认 64MB 会崩
+    shm_size: 1gb
+    mem_limit: 1g
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  adblock-data:

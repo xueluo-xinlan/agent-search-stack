@@ -1,0 +1,16 @@
+# 构建上下文裁剪：这些都不该进镜像
+node_modules/
+dist/
+.git/
+.gitignore
+*.log
+.env
+gateway.yaml
+gateway.docker.yaml
+data/
+.tmp/
+docs/*.mmd
+scripts/callgraph-data.json
+scripts/gen-callgraph.mjs
+docker/searxng/
+docker/.secret
