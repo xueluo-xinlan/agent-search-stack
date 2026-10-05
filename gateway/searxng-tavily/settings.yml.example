@@ -1,0 +1,58 @@
+# SearXNG Tavily 引擎配置模板（脱敏）
+# 复制为 settings.yml 并填入真实 API key 使用。
+#
+# 前提：
+#   1. 将 tavily.py 放入 searxng 引擎目录（searx/engines/tavily.py）
+#   2. 在 https://app.tavily.com 注册获取 API key（免费 1000 credits/月，无需信用卡）
+#
+# 引擎说明：
+#   - 走官方 API，不受出口 IP 信誉/反爬影响，中文质量高
+#   - basic 深度 = 1 credit/次，advanced = 2 credit/次
+#   - categories 默认 [general, web]，自动加入常规搜索
+
+use_default_settings: true
+
+engines:
+  - name: bilibili
+    disabled: false
+    categories: [videos, general]
+
+  - name: google
+    disabled: false
+    inactive: false
+
+  # bing 对本机 IP 返回降级垃圾（Windows 帮助/无关首页），禁用
+  - name: bing
+    disabled: true
+    base_url: https://cn.bing.com
+
+  - name: mojeek
+    disabled: false
+  - name: mojeek images
+    disabled: false
+  - name: mojeek news
+    disabled: false
+
+  - name: marginalia
+    disabled: false
+    inactive: false
+
+  # 低信誉兜底引擎，返回乱码垃圾，禁用
+  - name: seznam
+    disabled: true
+  - name: qwant
+    disabled: true
+
+  - name: yandex
+    disabled: false
+
+  # Tavily 引擎（需填真实 key）
+  - name: tavily
+    engine: tavily
+    shortcut: tvy
+    api_key: "tvly-REPLACE_WITH_YOUR_KEY"
+    page_size: 10
+    search_depth: basic
+    topic: general
+    categories: [general, web]
+    disabled: false

@@ -1,0 +1,104 @@
+# agent_search_gateway 网关配置（整体 yaml）
+# 复制为 gateway.yaml 使用。token 建议用环境变量 GATEWAY_TOKEN 注入，避免写文件。
+
+gateway:
+  host: 127.0.0.1
+  port: 3000
+  # token 请勿写在此文件（会提交到仓库）。用环境变量 GATEWAY_TOKEN 注入：
+  #   export GATEWAY_TOKEN=your-secret
+  # 留空 = 不认证；设置了 env GATEWAY_TOKEN 会优先于此处。
+  token: ""
+
+logging:
+  level: info          # debug | info | warn | error
+  file: ""             # 空=输出到 stdout，否则写文件
+
+searxng:
+  url: http://127.0.0.1:8888
+  timeout_ms: 10000
+
+flaresolverr:
+  url: http://127.0.0.1:8192
+  enabled: true            # 路由②（CF/JS 渲染）总开关
+  timeout_ms: 60000        # FlareSolverr 请求超时
+  max_concurrent: 2        # 并发信号量（保护浏览器资源）
+  trigger_status: [403, 405, 429]   # direct 这些状态 → 升级 FlareSolverr
+  fallback_on_empty: true  # direct 200 但空壳 JS → 升级
+
+search:
+  max_results: 10
+  max_result_chars: 500
+  cache_ttl_ms: 300000    # 5 分钟
+  cache_max_entries: 200
+  max_concurrent: 2       # 搜索并发信号量
+  fallback: true          # 当 SearXNG 未运行或不可达时，自动降级至直连搜索引擎（Tavily/DuckDuckGo）
+  tavily_api_key: ""      # 留空或从环境变量 TAVILY_API_KEY 注入
+
+rerank:
+  enabled: true
+  # 轻量重排层：绕过 searxng 的 category 分组排序，按「score × boost」降序重排，
+  # 让被分组算法埋掉的高分结果（如带缩略图的 bilibili 视频）正常入场。
+  # key 用 searxng 注册名（JSON engine 字段），非 settings.yml 的 name；
+  # 默认 1.0，不配 = 按原始 score 排序。
+  engine_boost:
+    bilibili: 1.2
+    "google cse": 1.0
+    bing: 1.0
+    duckduckgo: 1.0
+    brave: 1.0
+    wikipedia: 1.0
+    github: 1.0
+    stackoverflow: 1.0
+    reddit: 1.0
+    news: 1.0
+
+ad_filter:
+  enabled: true
+  # off | ads | ads+tracking | full
+  level: ads
+  extra_domains: []        # 额外屏蔽域名（追加到 hosts 之上）
+  hosts_file: data/adblock/hosts
+  auto_update: true        # 启动时若 hosts 缺失/过期自动拉取
+  auto_update_interval_ms: 86400000   # 过期阈值 24h
+  # 保白名单：这些域名即使命中黑名单也保留（防误杀）
+  allowlist:
+    - wikipedia.org
+    - github.com
+    - github.io
+    - githubusercontent.com
+    - stackoverflow.com
+    - stackexchange.com
+    - reddit.com
+    - youtube.com
+    - google.com
+    - bing.com
+
+fetch:
+  timeout_ms: 15000
+  max_bytes: 5242880       # 响应体上限 5MB
+  user_agent: ""           # 空=默认 Chrome UA
+  block_private_ips: true  # SSRF 防护
+  private_ip_exempt_cidrs:  # 命中视为非私有（默认豁免 Clash fake-ip 段）
+    - 198.18.0.0/15
+    - fdfe:dcba:9876::/64
+  structural: clean        # clean(默认去导航/广告) | full(保留完整结构)
+  max_output_chars: 20000  # 输出 md 上限
+  cache_ttl_ms: 600000     # fetch 结果缓存 10 分钟
+  cache_max_entries: 200
+
+browser:
+  enabled: true            # 浏览器能力（fetch 路由③ + browser_* 工具）
+  headless: true
+  pool_size: 1             # 实例池上限
+  idle_ttl_ms: 360000      # 空闲 360s 自动关闭（可配）
+  timeout_ms: 30000
+  max_concurrent: 2
+  engine: chromium         # chromium | camoufox（camoufox 预留）
+  proxy_server: ""         # 代理预留
+  proxy_username: ""
+  proxy_password: ""
+  wait_for_selector: ""    # 渲染前等待该选择器（复杂 SPA）
+  screenshot:
+    enabled: true
+    max_size: 512          # 截图最大边长像素（可配）
+    image_type: jpeg

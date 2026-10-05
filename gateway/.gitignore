@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+*.log
+data/adblock/hosts
+.tmp/
+# callgraph 生成产物/调试工具
+docs/callgraph.mmd
+scripts/callgraph-data.json
+scripts/gen-callgraph.mjs

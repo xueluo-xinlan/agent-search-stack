@@ -1,0 +1,21 @@
+# 凭据与实例配置：绝不入库
+.env
+*.env
+!.env.example
+gateway.yaml
+gateway.yaml.bak*
+config.local.yaml
+
+# 域名过滤清单（内容为大规模成人域名列表，不宜公开分发）
+searxng/hostnames-remove.yml
+searxng/hostnames-*.json
+
+# 依赖与构建产物
+node_modules/
+dist/
+data/
+__pycache__/
+*.pyc
+*.log
+.venv/
+venv/

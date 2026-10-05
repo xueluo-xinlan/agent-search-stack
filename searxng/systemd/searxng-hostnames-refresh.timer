@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily refresh of SearXNG hostname removal list
+
+[Timer]
+OnCalendar=*-*-* 04:10:00
+Persistent=true
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target

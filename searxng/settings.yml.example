@@ -1,0 +1,82 @@
+# Hermes A-lite：VPS 本地 SearXNG（云端兜底检索后端）
+# 用途：当 PC(amia) 关机/断链、B2 主通道不可用时，云端 Hermes 仍有可用的搜索后端。
+# 出口是数据中心 IP（示例：203.0.113.1）。
+#
+# 2026-09-13 首建：只留 google/bing/mojeek（当时 ddg 202、brave 429）。
+# 2026-09-18 复查：google 被 CAPTCHA 拦死、mojeek 零结果 → 仅 bing 独撑，结果质量无交叉验证。
+#   故扩测 15 个候选引擎，按「是否真出结果 + 首条相关性」定稿如下。
+#
+# —— 实测留用（5 个，通用检索）——
+#   bing        10/10 条  主力
+#   brave       19/18 条  结果最丰，首条常为权威源
+#   google      10/10 条  ⚠ 会被 CAPTCHA 停用 3600s（停用状态存内存，重启服务即清除）
+#   yandex      10/15 条
+#   360search    5/7 条   中文向
+#
+# —— 实测淘汰（勿再启用）——
+#   duckduckgo/qwant/baidu  CAPTCHA 拦截
+#   naver                   会把无关结果顶到第 1 名（污染排序）
+#   mwmbl                   中文零贡献；英文 100+ 条但精度低
+#   wikipedia/wikidata      对 Linux/丰川祥子/Tokyo 全为 0 条，哑的
+#   yep access denied | seznam timeout | sogou 崩溃 | quark 零结果 | mojeek 零结果
+#   startpage/swisscows/marginalia  无法初始化，从未上线
+use_default_settings:
+  engines:
+    keep_only:
+      - bing
+      - brave
+      - google
+      - yandex
+      - 360search
+engines:
+  - name: bing
+    disabled: false
+  - name: brave
+    disabled: false
+  - name: google
+    disabled: false
+  - name: yandex
+    disabled: false
+  - name: 360search
+    disabled: false
+
+general:
+  debug: false
+  instance_name: "SearXNG (self-hosted)"
+
+server:
+  secret_key: "CHANGE_ME__openssl_rand_hex_32"
+  bind_address: "127.0.0.1"
+  port: 8890
+  limiter: false
+  public_instance: false
+  image_proxy: false
+  method: "GET"
+
+search:
+  safe_search: 2
+  autocomplete: ""
+  default_lang: "auto"
+  max_page: 3
+  formats:
+    - html
+    - json
+
+ui:
+  static_use_hash: true
+  default_theme: simple
+
+outgoing:
+  request_timeout: 5.0
+  max_request_timeout: 15.0
+  pool_connections: 100
+  enable_http2: true
+
+valkey:
+  url: false
+
+# ── 结果过滤：移除成人/低质域名（SearXNG hostnames 插件）──
+# 清单文件不入库（内容为大规模成人域名列表，不宜公开分发）。
+# 自建方式：用每日定时任务抓取公开过滤源生成 hostnames-remove.yml，再启用下面两行。
+# hostnames:
+#   remove: 'hostnames-remove.yml'

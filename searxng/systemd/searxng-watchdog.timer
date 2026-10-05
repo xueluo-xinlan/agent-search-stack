@@ -1,0 +1,12 @@
+[Unit]
+Description=每 15 分钟探测一次 SearXNG 引擎停用状态
+
+[Timer]
+# 每 15 分钟跑一次：google 被 CAPTCHA 后最多 15 分钟内被发现
+OnCalendar=*:0/15:00
+# 若因关机/重启错过，开机后补跑一次
+Persistent=true
+Unit=searxng-watchdog.service
+
+[Install]
+WantedBy=timers.target

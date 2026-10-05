@@ -1,0 +1,19 @@
+[Unit]
+Description=SearXNG (Hermes A-lite local search backend, 127.0.0.1:8890)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/searxng
+Environment=SEARXNG_SETTINGS_PATH=/etc/searxng/settings.yml
+Environment=SEARXNG_BIND_ADDRESS=127.0.0.1
+Environment=PYTHONPATH=/opt/searxng
+ExecStart=/opt/searxng/.venv/bin/python /opt/searxng/searx/webapp.py
+Restart=always
+RestartSec=5
+# 兜底搜索后端，优先级低于主通道
+Nice=5
+
+[Install]
+WantedBy=multi-user.target

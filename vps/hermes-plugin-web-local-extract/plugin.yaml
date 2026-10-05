@@ -1,0 +1,7 @@
+name: web-local-extract
+version: 1.0.0
+description: "本地正文提取（Trafilatura + curl_cffi TLS 指纹）：接入 Hermes 免密钥提取环，远程免密钥档（Exa/Parallel/Firecrawl/Keenable）限流时自动接管。零成本、无限流、不走第三方。"
+author: user
+kind: backend
+provides_web_providers:
+  - local_extract

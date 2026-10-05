@@ -1,0 +1,11 @@
+[Unit]
+Description=检测式看门狗：SearXNG 引擎被停用时按需重启
+Documentation=file:/usr/local/bin/searxng-watchdog.py
+After=searxng.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/searxng-watchdog.py
+# 只有明确失败（探针异常 / 重启失败）才记为 failed；
+# "检出停用并成功重启" 属正常结果，退出码 0
+SuccessExitStatus=0

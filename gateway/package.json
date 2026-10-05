@@ -1,0 +1,31 @@
+{
+  "name": "agent_search_gateway",
+  "version": "0.1.0",
+  "description": "统一搜索/抓取网关：MCP server，封装 searxng + FlareSolverr + 内嵌 playwright",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "dev:stdio": "tsx src/index.ts --stdio",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:stdio": "node dist/index.js --stdio",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@mixmark-io/domino": "^2.2.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "playwright": "^1.62.1",
+    "turndown": "^7.2.4",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "@types/turndown": "^5.0.6",
+    "tsx": "^4.23.7",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}
