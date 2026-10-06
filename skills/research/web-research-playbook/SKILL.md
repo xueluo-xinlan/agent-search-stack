@@ -214,7 +214,7 @@ python3 ~/source_search.py "量子计算" --save                  # 追加进 JS
 2. `hostnames.remove: 'hostnames-remove.yml'`（SearXNG 的 hostnames 插件，把命中域名从结果的**标题/摘要**里抹掉）。清单 63887 条，由 `/usr/local/bin/searxng-hostnames-refresh.py` 生成（拉 StevenBlack hosts 的 unified/porn 差集 + 外置词根种子 `/etc/searxng/hostnames-seeds.json`），`searxng-hostnames-refresh.timer` 每日 04:10（+随机 600s）重建并重启 searxng。
 3. 搜索网关侧：`/opt/agent_search_gateway/gateway.yaml` 的 `ad_filter.level: ads+porn`。
 
-**回归检测**：`python3 ~/.hermes/cache/scratch/searxng_quality_check.py` —— 只输出条数/引擎名/命中计数，**永不打印 URL、标题、域名**（避免二次污染）。
+**回归检测**：按域统计检查（只看条数/引擎名/命中计数，**永不打印 URL、标题、域名**，避免二次污染）。这是会话级临时件，未随仓库提供；等价判断可直接看 `vps/mcp_probe.py` 输出的 `unresponsive_engines`。
 
 **写扫描器必看的两条（已踩过）**：
 - `hostnames-remove.yml` 里装的是**正则**（形如 `(.*\.)?xxx\.com$`），**不是裸域名**。拿裸域名逻辑去 `fullmatch` 会得到 0 命中 —— 那是**假阴性**，不是「库很干净」。必须先还原成域名片段再匹配（见 `session_poison_scan2.py`）。
@@ -281,7 +281,7 @@ browser:
 | 2 | 内嵌 playwright（chromium，headless） | 前两档都不行 | ✅ 配置已开 |
 | 3 | 人工（`browser_vault` / `computer_use`） | 登录墙、reCAPTCHA | 手动作业 |
 
-**第 1.5 档的实现**：`C:\Users\you\flaresolverr_compat\pc_flaresolverr_compat.py`
+**第 1.5 档的实现**：仓库 `pc/flaresolverr-compat/pc_flaresolverr_compat.py`（本机部署在 `C:\Users\you\flaresolverr_compat\`）
 ——自研最小实现（**byparr 在 PyPI 上查无此包**，别再去装），用系统 Edge + playwright，单线程串行 + 常驻浏览器上下文（首次请求惰性拉起）。API 与 FlareSolverr 对齐：`POST /v1 {"cmd":"request.get","url":…,"maxTimeout":ms}`、`GET /health`。
 常驻方式：计划任务 `FlareSolverrCompat`（`/sc onlogon`）→ 调 `start_flaresolverr_compat.bat`（11 目录内，日志同目录 `flaresolverr_compat.log`）。
 

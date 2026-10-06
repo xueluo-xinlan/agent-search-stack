@@ -33,7 +33,12 @@ metadata:
 | 一键脚本 | 同目录 `run_{xhs,bili,tieba,zhihu,weibo,douyin,kuaishou}.bat`（GBK、零交互、双击即跑） |
 | 数据落盘 | `data\<平台>\*.json`（store 目录名 = `bilibili/tieba/zhihu/weibo/douyin/kuaishou/xhs`） |
 | 登录态 | `browser_data\<平台>_user_data_dir\`（`SAVE_LOGIN_STATE=True`，扫一次长期复用） |
-| 生成器 | VPS `~/build/mk_mc_bats.py`（改关键词/模板后重跑即可） |
+| 生成器 | 仓库 `vps/build/mk_mc_bats.py`（本机 VPS `~/build/mk_mc_bats.py`；改关键词/模板后重跑即可） |
+| 上游来源 | `https://github.com/NanmiCoder/MediaCrawler`（`main` 分支，本机 HEAD `5d547f4`） |
+
+> ⚠️ **许可证：`NON-COMMERCIAL LEARNING LICENSE 1.1`**（版权 `relakkes@gmail.com`）——**仅限非商业学习用途**。
+> 本仓库**不分发** MediaCrawler 本体及其改造版（衍生作品同受该许可约束），只提供这份使用说明与生成器；
+> 需要使用时请自行 `git clone` 上游并按上面的部署事实配置。商用请先取得上游作者授权。
 
 执行命令（脚本内就是这一条）：
 

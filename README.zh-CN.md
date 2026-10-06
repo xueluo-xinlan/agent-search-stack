@@ -44,7 +44,8 @@ Agent（Hermes / OpenCode / 任意 MCP client）
 | `vps/web_backend.sh` | 后端开关：默认锁免费档，付费档手动开/关（避免「key 一存在就自动漂移」） |
 | `vps/mcp_probe.py` | 后端探针：分别打本地 / 远端通道，输出条数与 `unresponsive_engines` |
 | `gateway/` | 统一搜索/抓取网关（TypeScript，MCP over HTTP）：search / fetch / browser_* / health，fetch 智能路由 direct → FlareSolverr → playwright。附带 Dockerfile、docker-compose 与裸机安装脚本 |
-| `searxng/` | SearXNG 配置示例与 systemd 单元（含定时重建域名过滤清单的服务） |
+| `searxng/` | SearXNG 配置示例与 systemd 单元（含定时重建域名过滤清单的服务），以及配套运维脚本 `searxng/scripts/`（域名清单重建 + 检测式看门狗） |
+| `pc/flaresolverr-compat/` | Windows 侧住宅 IP 抓取通道：对 Playwright 封装出 **FlareSolverr 兼容 API**（`:8191`），带持久化浏览器 profile 与幂等自愈启动器，附淘宝 / 京东 / 苏宁 / 小红书 / B 站采集器 |
 | `skills/` | 把这些做法沉淀成的操作手册（含踩坑与验证方法） |
 
 ---

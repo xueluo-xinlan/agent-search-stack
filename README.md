@@ -44,7 +44,8 @@ The key rule in the fallback ring: **advance to the next tier only when an entir
 | `vps/web_backend.sh` | Backend switch: locks the free tier by default, paid tiers are enabled manually (prevents "key present ⇒ silent drift to paid") |
 | `vps/mcp_probe.py` | Backend probe: hits the local and remote channels separately, reports item counts and `unresponsive_engines` |
 | `gateway/` | Unified search/fetch gateway (TypeScript, MCP over HTTP): search / fetch / browser_* / health; fetch routes smartly direct → FlareSolverr → playwright. Ships with a Dockerfile, docker-compose and a bare-metal installer |
-| `searxng/` | SearXNG config example plus systemd units (including the daily domain-filter-list rebuild timer) |
+| `searxng/` | SearXNG config example, systemd units (including the daily domain-filter-list rebuild timer), and the matching ops scripts under `searxng/scripts/` (hostnames-list rebuild + detection-based watchdog) |
+| `pc/flaresolverr-compat/` | Residential-IP fetch channel for Windows: a self-contained **FlareSolverr-compatible API** (`:8191`) over Playwright with a persistent browser profile, idempotent self-healing launcher, plus collectors for taobao / jd / suning / xiaohongshu / bilibili |
 | `skills/` | Operational playbooks distilled from this work, pitfalls and verification methods included |
 
 ---

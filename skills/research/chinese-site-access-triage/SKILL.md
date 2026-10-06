@@ -106,7 +106,7 @@ metadata:
 
 - 经 PC 抓取层（`127.0.0.1:8191`，走 SSH 反向隧道）执行，返回结构化条目（标题/价格/原价/折扣/平台）。
 - 站点依赖见铁律五的表：**dangdang / smzdm 免登录**；taobao 依赖 profile 内的淘宝登录态。
-- 脚本本体：PC 上 `C:\Users\you\flaresolverr_compat\shop_search.py`；VPS 源文件 `~/build/shop_search.py`；
+- 脚本本体：仓库 `pc/flaresolverr-compat/shop_search.py`（本机部署在 `C:\Users\you\flaresolverr_compat\shop_search.py`）；
   VPS 入口 `~/shop_search.sh`（淘宝专用 `~/taobao_search.sh`）。
 - 新站接入方式：在 `shop_search.py` 的 `SITES` 里加一条 `(url 模板, 解析函数)`，
   解析函数照「按商品 ID 锚点切区间 → 区间内取第一个价格/标题」的套路写。
