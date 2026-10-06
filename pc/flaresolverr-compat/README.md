@@ -23,6 +23,7 @@
 | `pc_fs_hnew.py` | 同源变体（针对 `--headless=new` 的启动差异） |
 | `pc_test_flaresolverr.py` | 端到端自测：拿一个被 Cloudflare 保护的站验证真能过墙 |
 | `verify_cookies.py` / `verify_cookies.bat` | **人工过验证入口**：拉起有头浏览器，手动过验证码/登录，cookie 落盘进 profile |
+| `pc_guided_login.py` + `restart_guided_login.bat` | **商城引导登录**：打开淘宝 / 京东首页由人工登录，窗口保持约 25 分钟；cookie 落到独立 Edge profile。比 `verify_cookies` 更适合"只登录、不验证"的场合 |
 | `verify_check.py` | 登录态验证：抓两个"最能说明问题"的页面（京东价格占位符 vs 真实数字） |
 
 ### 常驻与运维
@@ -67,6 +68,10 @@ powershell -ExecutionPolicy Bypass -File .\pc_install_flaresolverr_task.ps1
 # 4) 首次人工过验证（有些墙只能靠账号态翻过）
 .\verify_cookies.bat
 #    → 弹出有头浏览器，手动过验证码 / 登录；cookie 落盘到 browser_profile\
+
+#    淘宝 / 京东这类"必须账号态"的，先单独刷一次登录（窗口保持约 25 分钟，够手动登录）：
+.\restart_guided_login.bat        # 等价于 python pc_guided_login.py
+#    → 登录后 cookie 落到 edge_profile\，之后再用 .\verify_cookies.bat 验证是否生效
 ```
 
 手动前台跑（排障用）：
