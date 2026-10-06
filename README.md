@@ -100,6 +100,26 @@ Bare-metal alternative: `gateway/scripts/install-native.sh` (installs a systemd 
 
 ---
 
+## Verification status — what is measured, what is not
+
+We state the boundary explicitly instead of letting you find out the hard way.
+
+**Verified (real runs, real output)**
+
+- `vps/source_search.py` + the MCP wrapper: abstract-bearing items in 0.4–1.1 s.
+- Local body extraction (Trafilatura + curl_cffi provider): 23 709 chars from a real page, no external service involved.
+- `searxng/` configuration and its systemd timers: running in production on the author's instance.
+- `pc/flaresolverr-compat/`: the compatibility layer and the collectors were exercised end-to-end against Cloudflare-protected and login-walled sites — **from the author's own machine and network**.
+
+**NOT verified**
+
+- **The Docker images have never been built.** Neither the author's server nor the Windows PC has Docker installed. `gateway/Dockerfile`, `docker-compose.yml` and the container config were checked **statically only** — YAML/bash syntax, plus the container config parsed through the gateway's real `loadConfig` schema validator (which returned `SCHEMA_OK`). `docker build` and `docker compose up` have never executed. Treat them as a starting point and please open an issue if the build breaks.
+- **The PC collectors have only ever run on one machine.** `pc/flaresolverr-compat/` grew out of real tasks on a Windows 11 box with Python 3.11 and system Edge. Absolute paths, the `pythonw.exe` location and the browser flags are written for *that* box — the `⚠️` placeholders in `start_flaresolverr_compat.bat` / `pc_install_flaresolverr_task.ps1` **must** be edited for yours. Site-side risk control also varies with IP and time of day, so behaviour elsewhere is expected to differ.
+- **No third-party or scale testing.** This is a single-author stack validated on the author's own hardware; no load testing, multi-user testing or long-run soak testing has been done.
+- **Target-site drift is not handled.** The collectors depend on the target sites' current DOM. A site redesign can silently break a parser; there is no auto-update mechanism.
+
+---
+
 ## Security
 
 - The repository contains **no keys**; every credential is injected through environment variables (`TAVILY_API_KEY` / `BRAVE_SEARCH_API_KEY` / `EXA_API_KEY`, …).

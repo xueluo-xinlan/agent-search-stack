@@ -100,6 +100,26 @@ cd gateway && ./scripts/docker-up.sh      # 构建并启动 gateway + SearXNG + 
 
 ---
 
+## 验证状态——哪些实测过，哪些没有
+
+边界写在明处，不让你自己去踩。
+
+**已实测（真实运行、真实输出）**
+
+- `vps/source_search.py` 与 MCP 封装：返回带摘要的条目，耗时 0.4–1.1 s。
+- 本地正文提取（Trafilatura + curl_cffi provider）：真实页面取到 23 709 字符，不依赖外部服务。
+- `searxng/` 配置与它的 systemd 定时器：已在作者实例上生产运行。
+- `pc/flaresolverr-compat/`：兼容层与采集器做过端到端验证，打的是 Cloudflare 交互挑战站与登录墙站——**但只在作者本机与本地网络下**。
+
+**未验证**
+
+- **Docker 镜像从未构建过。** 作者的服务器与 Windows PC 两处都没装 Docker。`gateway/Dockerfile`、`docker-compose.yml` 与容器配置**只做过静态校验**——YAML/bash 语法，外加把容器配置送进网关真实的 `loadConfig` schema 校验器（返回 `SCHEMA_OK`）。`docker build` / `docker compose up` **一次都没跑过**。请把它们当作起点，构建失败欢迎开 issue。
+- **PC 采集器只在一台机器上跑过。** `pc/flaresolverr-compat/` 是在一台 Windows 11 + Python 3.11 + 系统 Edge 的机器上长出来的；绝对路径、`pythonw.exe` 位置与浏览器参数都是按**那台机器**写的——`start_flaresolverr_compat.bat` / `pc_install_flaresolverr_task.ps1` 里标了 `⚠️` 的占位路径**必须**改成你自己的。另外站点风控还随 IP 与时段变化，换机器的表现预期会有差异。
+- **无第三方测试、无规模测试。** 单作者项目，只在自己的硬件上验证过；没有压测、没有多用户测试、没有长时间稳定性测试。
+- **站点改版未做兜底。** 采集器依赖目标站当前的 DOM 结构，站点一改版解析器可能悄悄失效，没有自动更新机制。
+
+---
+
 ## 安全
 
 - 仓库内**不含任何密钥**；所有凭据通过环境变量注入（`TAVILY_API_KEY` / `BRAVE_SEARCH_API_KEY` / `EXA_API_KEY` …）。
